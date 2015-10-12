@@ -46,7 +46,7 @@ private:
 	String Recv();
 private :
 	bool _islogin;
-	bool _reuseaddr;
+	socklen_t _reuseaddr;	//make the address can be reuse
 	int _fd;	//	文件描述符
 	AddrType *_paddrfilter;		//返回的地址信息的过滤器
 	String _username;

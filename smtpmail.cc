@@ -50,7 +50,7 @@ namespace Mail {
 		if (p == NULL) {
 			return NULL;
 		}
-		memset(p, 0, sizeof(struct addrinfo));
+		memset(p, 0, sizeof(AddrType));
 		//p->ai_flags = AI_CANONNAME;
 		p->ai_family = AF_UNSPEC;
 		p->ai_socktype = SOCK_STREAM;	
@@ -65,6 +65,7 @@ namespace Mail {
 			freeaddrinfo(res);
 			const char *str = strerror(errno);
 			log(str, strlen(str));
+			return NULL;
 		}
 		_islogin = true;
 
@@ -75,9 +76,13 @@ namespace Mail {
 		while (res != NULL) {
 			_fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 			if (_fd > 0) {
-				if (connect(_fd, res->ai_addr, sizeof(struct sockaddr)) == 0){
-					return true;
+				if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &_reuseaddr, sizeof(_reuseaddr))  == 0) {
+					if (connect(_fd, res->ai_addr, sizeof(struct sockaddr)) == 0){
+						return true;
+					}
 				}
+				close(_fd);
+				_fd = -1;
 			}
 			res = res->ai_next;
 		}
@@ -86,15 +91,14 @@ namespace Mail {
 	}
 	
 	bool SMTPMail::Login() {
-		Send(String("EHLO"+ _username +"\r\n"));
-		printf("%s\n", Recv().c_str());
+		Send(String("HELO"+ _username +"\r\n"));
+		printf("helo:%s\n", Recv().c_str());
 		
-		Send(String("AUTH LOGIN\r\n"));
-		printf("%s\n", Recv().c_str());
+		Send(String("auth login\r\n"));
+		printf("auth login:%s\n", Recv().c_str());
 		
 		size_t pos = _username.find('@', 0);
-		Send(Base64Encode(_username.substr(0, pos)) + "\r\n");
-		printf("dd");
+		Send(Base64Encode(_username) + "\r\n");
 		if (Recv().substr(0, 3) != "334") {
 			const char *str = "username error\n";
 			log(str, strlen(str));
@@ -102,7 +106,6 @@ namespace Mail {
 		}
 		
 		Send(String(_password + "\r\n"));
-		printf("dd");
 		if (Recv().substr(0, 3) != "235") {
 			const char *str = "password error\n";
 			log(str, strlen(str));
@@ -119,7 +122,7 @@ namespace Mail {
 		if (!Login()) {
 			return ;
 		}
-		printf("SS");
+		printf("SS\n");
 
 		Send(String("MAIL FROM: <" + _username + "\r\n"));
 		//Recv();
@@ -150,7 +153,7 @@ namespace Mail {
 	SMTPMail::String SMTPMail::Recv() {
 		const size_t buflen = 512;
 		static char buf[buflen];
-		if (recv(_fd, buf, buflen, MSG_WAITALL) < 0) {
+		if (recv(_fd, buf, buflen, 0) < 0) {
 			const char *str = "recv error\n";
 			log(str, strlen(str));
 
