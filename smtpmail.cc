@@ -91,26 +91,24 @@ namespace Mail {
 	}
 	
 	bool SMTPMail::Login() {
-		Send(String("HELO"+ _username +"\r\n"));
-		printf("helo:%s\n", Recv().c_str());
+		auto Check = [] (const String &res,
+				const String &mode) -> void {
+			printf("%s", res.c_str());
+			if (res.substr(0, 3) != mode) {
+				log(res.c_str(), res.length());
+			}
+		};
+		Send(String("HELO "+ _username +"\r\n"));
+		Check(Recv(), "250");
 		
 		Send(String("auth login\r\n"));
-		printf("auth login:%s\n", Recv().c_str());
+		Check(Recv(), "334");
 		
-		size_t pos = _username.find('@', 0);
 		Send(Base64Encode(_username) + "\r\n");
-		if (Recv().substr(0, 3) != "334") {
-			const char *str = "username error\n";
-			log(str, strlen(str));
-			return false;
-		}
-		
+		Check(Recv(), "334");
+
 		Send(String(_password + "\r\n"));
-		if (Recv().substr(0, 3) != "235") {
-			const char *str = "password error\n";
-			log(str, strlen(str));
-			return false;
-		}
+		Check(Recv(), "334");
 
 		return true;
 	}
@@ -122,9 +120,7 @@ namespace Mail {
 		if (!Login()) {
 			return ;
 		}
-		printf("SS\n");
-
-		Send(String("MAIL FROM: <" + _username + "\r\n"));
+		Send(String("MAIL FROM: <" + _username + ">\r\n"));
 		//Recv();
 		printf("%s\n", Recv().c_str());
 	
@@ -144,6 +140,7 @@ namespace Mail {
 	}
 
 	void SMTPMail::Send(const String &msg) {
+		printf("%s\n", msg.c_str());
 		if(send(_fd, msg.c_str(), msg.length(), MSG_CONFIRM) < 0) {
 			const char *str = "send error\n";
 			log(str, strlen(str));

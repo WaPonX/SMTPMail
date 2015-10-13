@@ -12,25 +12,23 @@
 #include <time.h>
 
 
-namespace {
-bool OpenLogFile(int &log) {
-	if ( (log = open("./mail.log", O_WRONLY | O_APPEND)) == -1) {
-		printf("open log file error!\n");
-		printf("please, make sure have a file called mail.log in the path\n");
-
-		return false;
-	}
-	return true;
-}
-
-std::string GetTime() {
-	time_t tt = time(NULL);
-
-	return std::string(ctime(&tt));
-}
-}
 
 namespace Mail {
+	bool OpenLogFile(int &log) {
+		if ( (log = open("./mail.log", O_WRONLY | O_APPEND)) == -1) {
+			printf("open log file error!\n");
+			printf("please, make sure have a file called mail.log in the path\n");
+
+			return false;
+		}
+		return true;
+	}
+
+	std::string GetTime() {
+		time_t tt = time(NULL);
+
+		return std::string(ctime(&tt));
+	}
 	void log(const char *str, size_t) {
 		static int log = -1;
 		if (log < 0) {

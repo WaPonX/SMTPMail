@@ -11,10 +11,10 @@
 int main() {
 	using Mail::SMTPMail;
 	SMTPMail *sm = new SMTPMail(SMTPMail::String("18826419224@163.com"),
-			SMTPMail::String("ASA199509010901"),
+			SMTPMail::String("idpdshehxshaqhxl"),
 			SMTPMail::String("smtp.163.com"));
 
-	sm->SendEmail("18826419224@163.com", "hello");
+	sm->SendEmail("18826419224@163.com", "helloi 这是一个演习！");
 
 	delete sm;
 
