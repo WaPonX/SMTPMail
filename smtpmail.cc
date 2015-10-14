@@ -98,6 +98,7 @@ namespace Mail {
 				log(res.c_str(), res.length());
 			}
 		};
+
 		Send(String("HELO "+ _username +"\r\n"));
 		Check(Recv(), "250");
 		
