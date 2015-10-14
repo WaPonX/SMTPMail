@@ -93,7 +93,6 @@ namespace Mail {
 	bool SMTPMail::Login() {
 		auto Check = [] (const String &res,
 				const String &mode) -> void {
-			printf("%s", res.c_str());
 			if (res.substr(0, 3) != mode) {
 				log(res.c_str(), res.length());
 			}
@@ -122,26 +121,22 @@ namespace Mail {
 			return ;
 		}
 		Send(String("MAIL FROM: <" + _username + ">\r\n"));
-		//Recv();
-		printf("%s\n", Recv().c_str());
+		Recv();
 	
 		Send(String("RCPT TO: <" + to + ">\r\n"));
-		//Recv();
-		printf("%s\n", Recv().c_str());
+		Recv();
 		
 		Send(String("DATA\r\n"));
-		//Recv();
-		printf("%s\n", Recv().c_str());
+		Recv();
 
 		Send(String("to:" + to + "\r\n" + text + "\r\n.\r\n"));
-		printf("%s\n",Recv().c_str());
+		Recv();
 
 		Send(String("QUIT\r\n"));
-		printf("%s\n", Recv().c_str());
+		Recv();
 	}
 
 	void SMTPMail::Send(const String &msg) {
-		printf("%s\n", msg.c_str());
 		if(send(_fd, msg.c_str(), msg.length(), MSG_CONFIRM) < 0) {
 			const char *str = "send error\n";
 			log(str, strlen(str));
