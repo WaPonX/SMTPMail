@@ -4,13 +4,15 @@
  * time  : 10.11.2015
  * ******************************************************************/
 
+#ifndef _MAIL_LOG_H
+#define _MAIL_LOG_H
+
 
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <string>
 #include <time.h>
-
 
 
 namespace Mail {
@@ -42,3 +44,5 @@ namespace Mail {
 	}
 
 }	// namespace Mail
+
+#endif	// _MAIL_LOG_H 

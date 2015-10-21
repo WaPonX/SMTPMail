@@ -4,6 +4,9 @@
  * time  : 10.11.2015
  * ******************************************************************/
 
+#ifndef _MAIL_BASE64ENCODE_H
+#define _MAIL_BASE64ENCODE_H
+
 #include <string>
 
 std::string Base64Encode(const std::string& src) {
@@ -39,3 +42,5 @@ std::string Base64Encode(const std::string& src) {
     
     return dst;
 }
+
+#endif	// _MAIL_BASE64ENCODE_H
